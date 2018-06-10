@@ -13,14 +13,14 @@ const Conn = new Sequelize(
 
 // type definitions
 const Clue = Conn.define('clue', {
-  description: {
+  text: {
     type: Sequelize.STRING,
     allowNull: false
   }
 })
 
 const Answer = Conn.define('answer', {
-  description: {
+  text: {
     type: Sequelize.STRING,
     allowNull: false
   }
@@ -35,10 +35,10 @@ Answer.belongsTo(Clue)
 Conn.sync({ force: true }).then(() => {
   _.times(1, () => {
     return Clue.create({
-      description: 'What is love?'
+      text: 'What is love?'
     }).then(clue => {
       return clue.createAnswer({
-        description: `Baby don't hurt me`
+        text: `Baby don't hurt me`
       })
     })
   })

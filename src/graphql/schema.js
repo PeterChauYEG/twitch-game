@@ -19,10 +19,10 @@ const Clue = new GraphQLObjectType({
           return clue.id
         }
       },
-      description: {
+      text: {
         type: GraphQLString,
         resolve(clue) {
-          return clue.description
+          return clue.text
         }
       },
       answer: {
@@ -46,10 +46,10 @@ const Answer = new GraphQLObjectType({
           return answer.id
         }
       },
-      description: {
+      text: {
         type: GraphQLString,
         resolve(answer) {
-          return answer.description
+          return answer.text
         }
       },
     }
