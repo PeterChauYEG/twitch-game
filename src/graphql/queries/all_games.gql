@@ -1,0 +1,7 @@
+#import "./game.gql"
+
+query games {
+  games {
+    ...Game
+  }
+}

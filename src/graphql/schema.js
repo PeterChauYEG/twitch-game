@@ -8,6 +8,27 @@ import {
 
 import Db from '../db'
 
+const Answer = new GraphQLObjectType({
+  name: 'Answer',
+  description: `This represents a game clue's answer`,
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(answer) {
+          return answer.id
+        }
+      },
+      text: {
+        type: GraphQLString,
+        resolve(answer) {
+          return answer.text
+        }
+      },
+    }
+  }
+})
+
 const Clue = new GraphQLObjectType({
   name: 'Clue',
   description: 'This represents a game clue',
@@ -35,23 +56,29 @@ const Clue = new GraphQLObjectType({
   }
 })
 
-const Answer = new GraphQLObjectType({
-  name: 'Answer',
-  description: `This represents a game clue's answer`,
+const Game = new GraphQLObjectType({
+  name: 'Game',
+  description: `This represents a game`,
   fields: () => {
     return {
       id: {
         type: GraphQLInt,
-        resolve(answer) {
-          return answer.id
+        resolve(game) {
+          return game.id
         }
       },
-      text: {
+      winner: {
         type: GraphQLString,
-        resolve(answer) {
-          return answer.text
+        resolve(game) {
+          return game.text
         }
       },
+      clues: {
+        type: new GraphQLList(Clue),
+        resolve(game) {
+          return game.getClues()
+        }
+      }
     }
   }
 })
@@ -81,6 +108,17 @@ const Query = new GraphQLObjectType({
         },
         resolve(root, args) {
           return Db.models.clue.findAll({ where: args })
+        }
+      },
+      games: {
+        type: new GraphQLList(Game),
+        args: {
+          id: {
+            type: GraphQLInt
+          }
+        },
+        resolve(root, args) {
+          return Db.models.game.findAll({ where: args })
         }
       }
     }

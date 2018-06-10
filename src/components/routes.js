@@ -16,8 +16,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-/* ReactQL */
-import GraphQLClue from './graphql'
+// GraphQL components
+import GraphQLClues from './graphql_clues'
+import GraphQLWinner from './graphql_winner'
 
 // NotFound 404 handler for unknown routes
 import { NotFound } from 'kit/lib/routing';
@@ -33,10 +34,9 @@ export const Home = () => (
     <p>Game End: 20:00 Mountain Time, June 11, 2018</p>
     <p>Time Remaining: 8:00 Hours</p>
     <hr />
-    <GraphQLClue />
+    <GraphQLClues />
     <hr />
-    <p>Game Winner:</p>
-    <p>Laboratory One</p>
+    <GraphQLWinner />
     <hr />
     <p>Game Rankings:</p>
     <p>1. Laboratory One - 100 points</p>

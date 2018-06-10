@@ -12,13 +12,6 @@ const Conn = new Sequelize(
 )
 
 // type definitions
-const Clue = Conn.define('clue', {
-  text: {
-    type: Sequelize.STRING,
-    allowNull: false
-  }
-})
-
 const Answer = Conn.define('answer', {
   text: {
     type: Sequelize.STRING,
@@ -26,7 +19,23 @@ const Answer = Conn.define('answer', {
   }
 })
 
+const Clue = Conn.define('clue', {
+  text: {
+    type: Sequelize.STRING,
+    allowNull: false
+  }
+})
+
+const Game = Conn.define('game', {
+  winner: {
+    type: Sequelize.STRING,
+    allowNull: true
+  }
+})
+
 // Relationships
+Game.hasMany(Clue)
+Clue.belongsTo(Game)
 Clue.hasOne(Answer)
 Answer.belongsTo(Clue)
 
@@ -34,11 +43,15 @@ Answer.belongsTo(Clue)
 // seed data
 Conn.sync({ force: true }).then(() => {
   _.times(1, () => {
-    return Clue.create({
-      text: 'What is love?'
-    }).then(clue => {
-      return clue.createAnswer({
-        text: `Baby don't hurt me`
+    return Game.create({
+      winner: null
+    }).then(game => {
+      return game.createClue({
+        text: 'What is love?'
+      }).then(clue => {
+        return clue.createAnswer({
+          text: `Baby don't hurt me`
+        })
       })
     })
   })

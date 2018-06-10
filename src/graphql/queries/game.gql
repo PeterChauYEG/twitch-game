@@ -1,0 +1,3 @@
+fragment Game on Game {
+  winner
+}

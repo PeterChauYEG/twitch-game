@@ -29,20 +29,22 @@ import allClues from 'src/graphql/queries/all_clues.gql';
 // component requires. Note: This is not to be confused with the `graphql`
 // lib, which is used on the server-side to initially define the schema
 @graphql(allClues)
-export default class GraphQLClue extends React.PureComponent {
+export default class GraphQLClues extends React.PureComponent {
   static propTypes = {
     data: PropTypes.shape({
-      clue: PropTypes.shape({
-        description: PropTypes.string,
-      }),
+      clues: PropTypes.arrayOf(
+        PropTypes.shape({
+          clue: PropTypes.shape({
+            description: PropTypes.string,
+          })
+        })
+      )
     }),
   }
 
   static defaultProps = {
     data: {
-      clue: {
-        description: null,
-      },
+      clues: []
     },
   }
 
@@ -63,7 +65,7 @@ export default class GraphQLClue extends React.PureComponent {
     if (!isLoading) {
       const mappedClues = clues.map((clue, i) => {
         return (
-          <p key={i}>{clue.description}</p>
+          <p key={i}>{clue.text}</p>
         )
       })
 
@@ -80,7 +82,7 @@ export default class GraphQLClue extends React.PureComponent {
   render() {
     return (
       <div>
-        <h2>Clue:</h2>
+        <h2>Clues</h2>
         {this.renderClues()}
       </div>
     );
