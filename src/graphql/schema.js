@@ -1,62 +1,94 @@
-// Schema for sample GraphQL server.
-
-// ----------------------
-// IMPORTS
-
-// GraphQL schema library, for building our GraphQL schema
 import {
   GraphQLObjectType,
+  GraphQLInt,
   GraphQLString,
-  GraphQLSchema,
-} from 'graphql';
+  GraphQLList,
+  GraphQLSchema
+} from 'graphql'
 
-// ----------------------
+import Db from '../db'
 
-// GraphQL can handle Promises from its `resolve()` calls, so we'll create a
-// simple async function that returns a simple message.  In practice, `resolve()`
-// will generally pull from a 'real' data source such as a database
-async function getMessage() {
-  return {
-    text: `Hello from the GraphQL server @ ${new Date()}`,
-  };
-}
-
-// Message type.  Imagine this like static type hinting on the 'message'
-// object we're going to throw back to the user
-const Message = new GraphQLObjectType({
-  name: 'Message',
-  description: 'GraphQL server message',
-  fields() {
+const Clue = new GraphQLObjectType({
+  name: 'Clue',
+  description: 'This represents a game clue',
+  fields: () => {
     return {
-      text: {
-        type: GraphQLString,
-        resolve(msg) {
-          return msg.text;
-        },
+      id: {
+        type: GraphQLInt,
+        resolve(clue) {
+          return clue.id
+        }
       },
-    };
-  },
-});
+      description: {
+        type: GraphQLString,
+        resolve(clue) {
+          return clue.description
+        }
+      },
+      answer: {
+        type: Answer,
+        resolve(clue) {
+          return clue.getAnswer()
+        }
+      }
+    }
+  }
+})
 
-// Root query.  This is our 'public API'.
+const Answer = new GraphQLObjectType({
+  name: 'Answer',
+  description: `This represents a game clue's answer`,
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(answer) {
+          return answer.id
+        }
+      },
+      description: {
+        type: GraphQLString,
+        resolve(answer) {
+          return answer.description
+        }
+      },
+    }
+  }
+})
+
 const Query = new GraphQLObjectType({
   name: 'Query',
-  description: 'Root query object',
-  fields() {
+  description: 'This is a root query',
+  fields: () => {
     return {
-      message: {
-        type: Message,
-        resolve() {
-          return getMessage();
+      answers: {
+        type: new GraphQLList(Answer),
+        args: {
+          id: {
+            type: GraphQLInt
+          }
         },
+        resolve(root, args) {
+          return Db.models.answer.findAll({ where: args })
+        }
       },
-    };
-  },
-});
+      clues: {
+        type: new GraphQLList(Clue),
+        args: {
+          id: {
+            type: GraphQLInt
+          }
+        },
+        resolve(root, args) {
+          return Db.models.clue.findAll({ where: args })
+        }
+      }
+    }
+  }
+})
 
-// The resulting schema.  We insert our 'root' `Query` object, to tell our
-// GraphQL server what to respond to.  We could also add a root `mutation`
-// if we want to pass mutation queries that have side-effects (e.g. like HTTP POST)
-export default new GraphQLSchema({
-  query: Query,
-});
+const Schema = new GraphQLSchema({
+  query: Query
+})
+
+export default Schema

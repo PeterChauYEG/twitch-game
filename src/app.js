@@ -51,6 +51,8 @@ config.addReducer('counter', counterReducer, { count: 0 });
 // 2.  On the client, it will append the correct server URL so that we can
 // call the ReactQL host properly, and let the server handle our requests
 config.enableGraphQLServer();
+// config.setGraphQLEndpoint('http://localhost:3000/graphql')
+
 
 /* SERVER */
 

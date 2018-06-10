@@ -1,0 +1,7 @@
+#import "./clue.gql"
+
+query clues {
+  clues {
+    ...Clue
+  }
+}

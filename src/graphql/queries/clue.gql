@@ -1,0 +1,3 @@
+fragment Clue on Clue {
+  description
+}
