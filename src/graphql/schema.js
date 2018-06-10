@@ -1,9 +1,10 @@
 import {
-  GraphQLObjectType,
   GraphQLInt,
-  GraphQLString,
   GraphQLList,
-  GraphQLSchema
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLString
 } from 'graphql'
 
 import Db from '../db'
@@ -70,7 +71,7 @@ const Game = new GraphQLObjectType({
       winner: {
         type: GraphQLString,
         resolve(game) {
-          return game.text
+          return game.winner
         }
       },
       clues: {
@@ -125,8 +126,34 @@ const Query = new GraphQLObjectType({
   }
 })
 
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  description: 'Functions to create stuff',
+  fields() {
+    return {
+      setWinner: {
+        type: Game,
+        args: {
+          username: {
+            type: new GraphQLNonNull(GraphQLString)
+          }
+        },
+        resolve(_, args) {
+          return Db.models.game.update(
+            { winner: args.username },
+            { where: { id: 1 } }
+          ).then((game) => {
+            return Db.models.game.find({ where: { id: 1 }})
+          })
+        }
+      }
+    }
+  }
+})
+
 const Schema = new GraphQLSchema({
-  query: Query
+  query: Query,
+  mutation: Mutation
 })
 
 export default Schema

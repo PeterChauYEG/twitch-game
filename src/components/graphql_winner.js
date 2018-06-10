@@ -55,6 +55,7 @@ export default class GraphQLGames extends React.PureComponent {
     // data not yet being loaded by checking to see that we have the `message`
     // key on our returned object
     const games = data.games
+    console.log({ games })
 
     // Apollo will tell us whether we're still loading.  We can also use this
     // check to ensure we have a fully returned response

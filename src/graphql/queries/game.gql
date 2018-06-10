@@ -1,3 +1,4 @@
 fragment Game on Game {
+  id, 
   winner
 }
