@@ -7,8 +7,13 @@ import {
   GraphQLString
 } from 'graphql'
 
+import { PubSub, withFilter } from 'graphql-subscriptions'
+
 import Db from '../db'
 
+const pubsub = new PubSub()
+
+// Types
 const Answer = new GraphQLObjectType({
   name: 'Answer',
   description: `This represents a game clue's answer`,
@@ -128,7 +133,7 @@ const Query = new GraphQLObjectType({
 
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
-  description: 'Functions to create stuff',
+  description: 'Functions to create/update data',
   fields() {
     return {
       setWinner: {
@@ -142,8 +147,10 @@ const Mutation = new GraphQLObjectType({
           return Db.models.game.update(
             { winner: args.username },
             { where: { id: 1 } }
-          ).then((game) => {
+          ).then(() => {
             return Db.models.game.find({ where: { id: 1 }})
+          }).then(game => {
+            pubsub.publish('gameWon', { gameWon: { id: game.dataValues.id, winner: game.dataValues.winner }})
           })
         }
       }
@@ -151,9 +158,24 @@ const Mutation = new GraphQLObjectType({
   }
 })
 
+const Subscription = new GraphQLObjectType({
+  name: 'Subscription',
+  description: 'Function to push data to client',
+  fields() {
+    return {
+      gameWon: {
+        type: Game,
+        description: 'Listens for when a game has been won',
+        subscribe: () => pubsub.asyncIterator('gameWon')
+      }
+    }
+  }
+})
+
 const Schema = new GraphQLSchema({
   query: Query,
-  mutation: Mutation
+  mutation: Mutation,
+  subscription: Subscription
 })
 
 export default Schema

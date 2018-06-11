@@ -5,6 +5,7 @@
 
 // Apollo client library
 import { createNetworkInterface, ApolloClient } from 'react-apollo';
+import { SubscriptionClient, addGraphQLSubscriptions } from 'subscriptions-transport-ws'
 
 /* ReactQL */
 
@@ -45,7 +46,20 @@ export function browserClient() {
   const uri = config.graphQLServer
     ? `${getServerURL()}${config.graphQLEndpoint}` : config.graphQLEndpoint;
 
-  return createClient({
-    networkInterface: getNetworkInterface(uri),
+  const networkInterface = getNetworkInterface(uri)
+
+  const wsClient = new SubscriptionClient(`ws://localhost:8081/subscriptions`, {
+    reconnect: true
+  })
+
+  const networkInterfaceWithSubscriptions = addGraphQLSubscriptions(
+    networkInterface,
+    wsClient
+  )
+
+  const client = createClient({
+    networkInterface: networkInterfaceWithSubscriptions,
   });
+
+  return client
 }

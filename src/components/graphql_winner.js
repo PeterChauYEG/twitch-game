@@ -21,6 +21,7 @@ import { graphql } from 'react-apollo';
 // Webpack will compile this into inline GraphQL for us, so we can pass the
 // query to components using the @graphql decorator
 import allGames from 'src/graphql/queries/all_games.gql';
+import gameWon from 'src/graphql/queries/game_won.gql';
 
 // ----------------------
 
@@ -28,23 +29,19 @@ import allGames from 'src/graphql/queries/all_games.gql';
 // `react-apollo`'s `graphql` HOC/decorator and pass in the query that this
 // component requires. Note: This is not to be confused with the `graphql`
 // lib, which is used on the server-side to initially define the schema
-@graphql(allGames)
+@graphql(gameWon)
 export default class GraphQLGames extends React.PureComponent {
   static propTypes = {
     data: PropTypes.shape({
-      games: PropTypes.arrayOf(
-        PropTypes.shape({
-          game: PropTypes.shape({
-            winner: PropTypes.string,
-          })
-        })
-      )
+      gameWon: PropTypes.shape({
+        winner: PropTypes.string,
+      })
     }),
   }
 
   static defaultProps = {
     data: {
-      games: []
+      gameWon: null
     },
   }
 
@@ -54,8 +51,7 @@ export default class GraphQLGames extends React.PureComponent {
     // Since we're dealing with async GraphQL data, we defend against the
     // data not yet being loaded by checking to see that we have the `message`
     // key on our returned object
-    const games = data.games
-    console.log({ games })
+    const gameWon = data.gameWon
 
     // Apollo will tell us whether we're still loading.  We can also use this
     // check to ensure we have a fully returned response
@@ -64,7 +60,7 @@ export default class GraphQLGames extends React.PureComponent {
     let result = null
 
     if (!isLoading) {
-      const winner = games[0].winner
+      const winner = gameWon.winner
 
       result = (
         <p>

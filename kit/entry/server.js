@@ -74,6 +74,8 @@ import apolloLocalQuery from 'apollo-local-query';
 // Import all of the GraphQL lib, for use with our Apollo client connection
 import * as graphql from 'graphql';
 
+import { SubscriptionServer } from 'subscriptions-transport-ws'
+
 /* ReactQL */
 
 // App entry point.  This must come first, because app.js will set-up the
@@ -372,6 +374,7 @@ if (config.graphiQL) {
     graphiQLEndpoint,
     graphiqlKoa({
       endpointURL: config.graphQLEndpoint,
+      subscriptionsEndpoint: `ws://localhost:8081/subscriptions`
     }),
   );
 }
@@ -408,9 +411,18 @@ const listen = () => {
 
   // Plain HTTP
   if (config.enableHTTP) {
-    servers.push(
-      http.createServer(app.callback()).listen(process.env.PORT),
-    );
+    const ws = http.createServer(app.callback()).listen(process.env.PORT, () => {
+      new SubscriptionServer({
+        execute: graphql.execute,
+        subscribe: graphql.subscribe,
+        schema: config.graphQLSchema
+      }, {
+        server: ws,
+        path: '/subscriptions'
+      })
+    })
+
+    servers.push(ws);
   }
 
   // SSL -- only enable this if we have an `SSL_PORT` set on the environment
