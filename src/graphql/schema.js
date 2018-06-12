@@ -1,4 +1,5 @@
 import {
+  GraphQLEnumType,
   GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
@@ -6,6 +7,10 @@ import {
   GraphQLSchema,
   GraphQLString
 } from 'graphql'
+
+import {
+  GraphQLDateTime
+} from 'graphql-iso-date'
 
 import { PubSub, withFilter } from 'graphql-subscriptions'
 
@@ -71,6 +76,32 @@ const Game = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(game) {
           return game.id
+        }
+      },
+      end_time: {
+        type: GraphQLDateTime,
+        resolve(game) {
+          return game.end_time
+        }
+      },
+      start_time: {
+        type: GraphQLDateTime,
+        resolve(game) {
+          return game.start_time
+        }
+      },
+      state: {
+        type: new GraphQLEnumType({
+          name: 'game_state',
+          values: {
+            NOT_STARTED: GraphQLInt,
+            IN_PROGRESS: GraphQLInt,
+            WON: GraphQLInt,
+            COMPLETED: GraphQLInt
+          }
+        }),
+        resolve(game) {
+          return game.state
         }
       },
       winner: {

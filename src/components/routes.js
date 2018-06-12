@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 
 // GraphQL components
 import GraphQLClues from './graphql_clues'
+import GraphQLGame from './graphql_game'
 import GraphQLWinner from './graphql_winner'
 
 // NotFound 404 handler for unknown routes
@@ -30,9 +31,7 @@ export const Home = () => (
   <div>
     <h1>Twitch Game Leader Board</h1>
     <hr />
-    <p>Game Start: 12:00 Mountain Time, June 11, 2018</p>
-    <p>Game End: 20:00 Mountain Time, June 11, 2018</p>
-    <p>Time Remaining: 8:00 Hours</p>
+    <GraphQLGame />
     <hr />
     <GraphQLClues />
     <hr />
