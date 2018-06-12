@@ -1,3 +1,4 @@
+// NODE
 import {
   GraphQLEnumType,
   GraphQLInt,
@@ -7,15 +8,16 @@ import {
   GraphQLSchema,
   GraphQLString
 } from 'graphql'
-
 import {
   GraphQLDateTime
 } from 'graphql-iso-date'
-
 import { PubSub, withFilter } from 'graphql-subscriptions'
+import moment from 'moment'
 
+// database
 import Db from '../db'
 
+// initialize pubsub for graphql
 const pubsub = new PubSub()
 
 // Types
@@ -176,12 +178,27 @@ const Mutation = new GraphQLObjectType({
         },
         resolve(_, args) {
           return Db.models.game.update(
-            { winner: args.username },
+            {
+              end_state: moment(),
+              state: 'WON',
+              winner: args.username
+            },
             { where: { id: 1 } }
           ).then(() => {
             return Db.models.game.find({ where: { id: 1 }})
           }).then(game => {
-            pubsub.publish('gameWon', { gameWon: { id: game.dataValues.id, winner: game.dataValues.winner }})
+            pubsub.publish(
+              'gameWon',
+              {
+                gameWon: {
+                  end_time: game.dataValues.end_time,
+                  id: game.dataValues.id,
+                  start_time: game.dataValues.start_time,
+                  state: game.dataValues.state,
+                  winner: game.dataValues.winner
+                }
+              }
+            )
           })
         }
       }

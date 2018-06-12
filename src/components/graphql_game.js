@@ -8,13 +8,14 @@
 // IMPORTS
 
 /* NPM */
+import moment from 'moment'
 
+// React
 import React from 'react';
 import PropTypes from 'prop-types';
 
 // GraphQL
 import { graphql } from 'react-apollo';
-
 /* App */
 
 // GraphQL queries.  Looking at this file demonstrates how to import fragments.
@@ -32,10 +33,13 @@ import allGames from 'src/graphql/queries/all_games.gql';
 export default class GraphQLGame extends React.PureComponent {
   static propTypes = {
     data: PropTypes.shape({
-      clues: PropTypes.arrayOf(
+      games: PropTypes.arrayOf(
         PropTypes.shape({
-          clue: PropTypes.shape({
-            description: PropTypes.string,
+          game: PropTypes.shape({
+            end_time: PropTypes.string,
+            start_time: PropTypes.string,
+            state: PropTypes.string,
+            winner: PropTypes.string
           })
         })
       )
@@ -44,17 +48,12 @@ export default class GraphQLGame extends React.PureComponent {
 
   static defaultProps = {
     data: {
-      clues: []
+      games: []
     },
   }
 
   renderGame() {
     const { data } = this.props;
-
-    // Since we're dealing with async GraphQL data, we defend against the
-    // data not yet being loaded by checking to see that we have the `message`
-    // key on our returned object
-    const games = data.games
 
     // Apollo will tell us whether we're still loading.  We can also use this
     // check to ensure we have a fully returned response
@@ -63,12 +62,17 @@ export default class GraphQLGame extends React.PureComponent {
     let result = null
 
     if (!isLoading) {
+      const game = data.games[0]
+      const formattedEndTime = moment(game.end_time).format('LLLL')
+      const formattedStartTime = moment(game.start_time).format('LLLL')
+      const timeRemaining = moment.duration(moment(game.end_time).diff(moment(game.start_end)))
+
       result = (
         <div>
-          <p>Game Start: {games[0].start_time}</p>
-          <p>Game End: {games[0].end_time}</p>
-          <p>Game State: {games[0].state}</p>
-          <p>Time Remaining: 8:00 Hours</p>
+          <p>Game Start: {formattedStartTime}</p>
+          <p>Game End: {formattedEndTime}</p>
+          <p>Game State: {game.state}</p>
+          <p>Time Remaining: {timeRemaining.as('minutes')} minutes</p>
         </div>
         )
     }

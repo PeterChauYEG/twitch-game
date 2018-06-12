@@ -1,6 +1,6 @@
 fragment Game on Game {
-  id,
   end_time,
+  id,
   start_time,
   state,
   winner
